@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import TableOrder from "../components/product_components/TableOrder";
 import { langs } from "../Contexts/values/LangValues";
 import { useEffect } from "react";
+import Script from "next/script";
 
 export default function checkout() {
   const router = useRouter();
@@ -33,22 +34,85 @@ export default function checkout() {
     cost: total,
   });
   const [send, setSend] = useState(false);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   // set new order to sent
-  const submitHandler = (form) => {
-    // make a product model to send
-    const { name, lastname, address, phone } = form;
-    const newOrder = {
-      name,
-      lastname,
-      address,
-      phone,
-      cart,
-      cost: total,
-      amount,
-    };
-    setOrders(newOrder);
-    setSend(true);
+  const submitHandler = async (form) => {
+    setPaymentLoading(true);
+    console.log('Key ID:', process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
+    console.log('Amount:', total);
+    try {
+      // Create Razorpay order
+      const response = await fetch('/api/payment/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ amount: total }),
+      });
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('Error response:', errorText);
+        alert('Failed to create payment order: ' + errorText);
+        setPaymentLoading(false);
+        return;
+      }
+      const orderData = await response.json();
+      console.log('Order data:', orderData);
+
+      if (!response.ok) {
+        alert('Failed to create payment order');
+        setPaymentLoading(false);
+        return;
+      }
+
+      // Initialize Razorpay
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'NextOmmerce',
+        description: 'Order Payment',
+        order_id: orderData.id,
+        handler: async function (response) {
+          // Payment successful
+          const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = response;
+
+          // make a product model to send
+          const { name, lastname, address, phone } = form;
+          const newOrder = {
+            name,
+            lastname,
+            address,
+            phone,
+            cart,
+            cost: total,
+            amount,
+            payment_id: razorpay_payment_id,
+            razorpay_order_id,
+            razorpay_signature,
+          };
+          setOrders(newOrder);
+          setSend(true);
+        },
+        prefill: {
+          name: form.name,
+          email: account.email || '',
+          contact: form.phone,
+        },
+        theme: {
+          color: '#3399cc',
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error('Payment initialization error:', error);
+      alert('Payment failed. Please try again.');
+    }
+    setPaymentLoading(false);
   };
 
   //sending order
@@ -89,11 +153,16 @@ export default function checkout() {
   })
 
   return (
-    <div
-    style={{ direction: `${lang === langs["fa"] ? "rtl" : "ltr"}` }}
-      className={`relative bg-secondary text-secondary py-10`}
-    >
-      <div className="w-4/5 max-w-[500px] border-2 bg-third border-third p-6 sm:px-10 mx-auto rounded-xl flex flex-col">
+    <>
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="beforeInteractive"
+      />
+      <div
+      style={{ direction: `${lang === langs["fa"] ? "rtl" : "ltr"}` }}
+        className={`relative bg-secondary text-secondary py-10`}
+      >
+        <div className="w-4/5 max-w-[500px] border-2 bg-third border-third p-6 sm:px-10 mx-auto rounded-xl flex flex-col">
         <form
         
           onSubmit={handleSubmit(submitHandler)}
@@ -183,8 +252,12 @@ export default function checkout() {
           <h3 className="text-lg mt-5 text-primary">{t("cart_table")}</h3>
           <TableOrder cart={cart} />
           <div className="w-1/2 flex flex-col items-center mx-auto mt-7">
-            <button className="rounded-full w-full mx-auto text-xl py-3 bg-accent text-white shadow-md my-8">
-              {t("SUBMIT")}
+            <button
+              type="submit"
+              disabled={paymentLoading}
+              className="rounded-full w-full mx-auto text-xl py-3 bg-accent text-white shadow-md my-8 disabled:opacity-50"
+            >
+              {paymentLoading ? t("Processing Payment...") : t("SUBMIT")}
             </button>
           </div>
         </form>
@@ -194,34 +267,35 @@ export default function checkout() {
         >
           {t("cancel")}
         </button>
-      </div>
-      {/* modal */}
-      {send === true ? (
-        <div className="absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center bg-[#000000d3]">
-          <div className="rounded-2xl bg-white w-3/4 min-w-[200px] max-w-[350px] pt-12 pb-9 text-center">
-            <h5 className="text-xl text-gray-900 mb-14">{t("asure_q")}</h5>
-            <div className="flex flex-row justify-around text-white w-full">
-              <button
-                onClick={() => {
-                  setSend(false);
-                }}
-                className="bg-danger py-2 w-[40%] rounded-full"
-              >
-                {t("return")}
-              </button>
-              <button
-                onClick={() => {
-                  setSend(false);
-                  sendOrder();
-                }}
-                className="bg-accent py-2 w-[45%] rounded-full"
-              >
-                {t("continue")}
-              </button>
+        </div>
+        {/* modal */}
+        {send === true ? (
+          <div className="absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center bg-[#000000d3]">
+            <div className="rounded-2xl bg-white w-3/4 min-w-[200px] max-w-[350px] pt-12 pb-9 text-center">
+              <h5 className="text-xl text-gray-900 mb-14">{t("asure_q")}</h5>
+              <div className="flex flex-row justify-around text-white w-full">
+                <button
+                  onClick={() => {
+                    setSend(false);
+                  }}
+                  className="bg-danger py-2 w-[40%] rounded-full"
+                >
+                  {t("return")}
+                </button>
+                <button
+                  onClick={() => {
+                    setSend(false);
+                    sendOrder();
+                  }}
+                  className="bg-accent py-2 w-[45%] rounded-full"
+                >
+                  {t("continue")}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      ) : null}
-    </div>
+        ) : null}
+      </div>
+    </>
   );
 }

@@ -13,8 +13,8 @@ export default function TableOrder({ cart }) {
         <td>{item.name.replace(/_/g, " ")}</td>
         <td>{item.color}</td>
         <td>{item.amount}</td>
-        <td>{item.price}$</td>
-        <td>{item.price*item.amount}$</td>
+        <td>{item.price}₹</td>
+        <td>{item.price*item.amount}₹</td>
       </tr>)}
       <style jsx>{`
       tr:nth-child(even){

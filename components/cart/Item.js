@@ -36,7 +36,7 @@ export default function Item({ item, index }) {
             ) : null}
           </div>
         </div>
-        <p>{price}$</p>
+        <p>{price}₹</p>
       </div>
       <div className="flex flex-row mt-4">
         <button

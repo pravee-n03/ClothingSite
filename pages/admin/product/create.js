@@ -93,155 +93,221 @@ function create() {
   };
 
   return (
-    <div className="bg-primary w-full text-secondary p-6">
-      <form
-        className="w-[60%] mx-auto flex flex-col"
-        onSubmit={handleSubmit(submitHandler)}
-      >
-        {/* modal for saving new store */}
-        <AcceptModal
-          showModal={showModal}
-          setShowModal={setShowModal}
-          setSave={setSave}
-        />
+    <div className="bg-primary min-h-screen py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-secondary rounded-2xl shadow-xl p-8 border border-gray-200">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold text-primary mb-2">Create New Product</h1>
+            <p className="text-secondary">Add a new product to your inventory</p>
+          </div>
 
-        <label className="mt-5 ml-10">name</label>
-        <input
-          className="w-72 ml-8 bg-hover  mt-2 rounded-full text-secondary pl-3 py-0.5"
-          type="text"
-          placeholder="product name..."
-          {...register("name", {
-            required: true,
-            pattern:
-              /^[^+={}()<>!@#$%^&*?;:,|\\/_.]*[^\s+={}()<>!@#$%^&*?;:,|\\/_.]$/,
-          })}
-        />
-        {errors.name && (
-          <p className="text-red-700 ml-10 mt-1">
-            {errors.name.type === "required"
-              ? "enter the product name"
-              : "name should not end with white space or containes any of these +={}()<>!@#$%^&*?;:,|\\._/"}
-          </p>
-        )}
+          <form
+            className="space-y-8"
+            onSubmit={handleSubmit(submitHandler)}
+          >
+            {/* modal for saving new store */}
+            <AcceptModal
+              showModal={showModal}
+              setShowModal={setShowModal}
+              setSave={setSave}
+            />
 
-        <label className="mt-5 ml-10">Category</label>
-        <select
-          className="w-72 ml-8 bg-hover  mt-2 rounded-full pl-3 py-0.5 text-secondary"
-          name="category"
-          {...register("category", { required: true })}
-        >
-          <option value="" selected disabled>
-            ----------
-          </option>
-          {allCats?.map((cat, i) => (
-            <option key={i} value={cat}>
-              {cat}
-            </option>
-          ))}
-        </select>
-        {errors.category && (
-          <p className="text-red-700 ml-10">choose the product category</p>
-        )}
+            {/* Basic Information Section */}
+            <div className="bg-third rounded-xl p-6 border border-gray-200">
+              <h2 className="text-xl font-semibold text-primary mb-6 flex items-center">
+                <span className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-bold mr-3">1</span>
+                Basic Information
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    Product Name
+                  </label>
+                  <input
+                    className="w-full bg-primary border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                    type="text"
+                    placeholder="Enter product name..."
+                    {...register("name", {
+                      required: true,
+                      pattern:
+                        /^[^+={}()<>!@#$%^&*?;:,|\\/_.]*[^\s+={}()<>!@#$%^&*?;:,|\\/_.]$/,
+                    })}
+                  />
+                  {errors.name && (
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.name.type === "required"
+                        ? "Product name is required"
+                        : "Name should not end with whitespace or contain special characters"}
+                    </p>
+                  )}
+                </div>
 
-        <label className="mt-5 ml-10">price</label>
-        <input
-          className="w-72 ml-8 bg-hover  mt-2 rounded-full text-secondary pl-3 py-0.5"
-          type="number"
-          placeholder="$"
-          {...register("price", { required: true })}
-        />
-        {errors.price && (
-          <p className="ml-10 text-red-700">enter the product price</p>
-        )}
-        <div className="border-[1px] border-hovercont w-full  px-8 rounded-md my-9 pb-9">
-          {storeSt?.map((kind, i) => {
-            return (
-              <TableKinds
-                key={i}
-                i={i}
-                register={register}
-                errors={errors}
-                storeSt={storeSt}
-                setStoreSt={setStoreSt}
-              />
-            );
-          })}
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    Category
+                  </label>
+                  <select
+                    className="w-full bg-primary border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                    name="category"
+                    {...register("category", { required: true })}
+                  >
+                    <option value="" selected disabled>
+                      Select a category...
+                    </option>
+                    {allCats?.map((cat, i) => (
+                      <option key={i} value={cat}>
+                        {cat}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.category && (
+                    <p className="text-red-500 text-sm mt-1">Please select a category</p>
+                  )}
+                </div>
 
-          {/* adding new kind or delete the last kind */}
-          <div className="text-center flex flex-row justify-between">
-            <button
-              className="w-1/2 mx-auto mt-10 bg-hover rounded-full text-secondary px-auto py-0.5 hover:bg-transparent hover:border-[1px] hover:border-primarycont hover:text-primary"
-              onClick={() => {
-                setStoreSt([
-                  ...storeSt,
-                  {
-                    color: "",
-                    colorCode: "",
-                    sizeAmnt: [{ size: "", amount: 0 }],
-                    imgUrls: [],
-                  },
-                ]);
-              }}
-            >
-              add new color
-            </button>
-            <br />
-            {storeSt.length > 1 && (
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    Price (₹)
+                  </label>
+                  <input
+                    className="w-full bg-primary border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                    type="number"
+                    placeholder="0.00"
+                    {...register("price", { required: true })}
+                  />
+                  {errors.price && (
+                    <p className="text-red-500 text-sm mt-1">Price is required</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Product Variants Section */}
+            <div className="bg-third rounded-xl p-6 border border-gray-200">
+              <h2 className="text-xl font-semibold text-primary mb-6 flex items-center">
+                <span className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-bold mr-3">2</span>
+                Product Variants
+              </h2>
+              <div className="space-y-6">
+                {storeSt?.map((kind, i) => {
+                  return (
+                    <div key={i} className="border border-gray-200 rounded-lg p-4">
+                      <TableKinds
+                        register={register}
+                        errors={errors}
+                        storeSt={storeSt}
+                        setStoreSt={setStoreSt}
+                        i={i}
+                      />
+                    </div>
+                  );
+                })}
+
+                {/* Add/Remove Color Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <button
+                    type="button"
+                    className="flex items-center justify-center px-6 py-3 bg-accent hover:bg-green-600 text-white rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                    onClick={() => {
+                      setStoreSt([
+                        ...storeSt,
+                        {
+                          color: "",
+                          colorCode: "",
+                          sizeAmnt: [{ size: "", amount: 0 }],
+                          imgUrls: [],
+                        },
+                      ]);
+                    }}
+                  >
+                    <span>Add New Color Variant</span>
+                  </button>
+                  {storeSt.length > 1 && (
+                    <button
+                      type="button"
+                      className="flex items-center justify-center px-6 py-3 bg-danger hover:bg-red-700 text-white rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                      onClick={() => {
+                        let tempObj = storeSt;
+                        tempObj.pop();
+                        setStoreSt([...tempObj]);
+                      }}
+                    >
+                      <span>Remove Last Color</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Description Section */}
+            <div className="bg-third rounded-xl p-6 border border-gray-200">
+              <h2 className="text-xl font-semibold text-primary mb-6 flex items-center">
+                <span className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-bold mr-3">3</span>
+                Description
+              </h2>
+              <div>
+                <textarea
+                  className="w-full h-40 bg-primary border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none resize-none"
+                  type="text"
+                  placeholder="Describe your product..."
+                  {...register("description", { required: true })}
+                />
+                {errors.description && (
+                  <p className="text-red-500 text-sm mt-1">Description is required</p>
+                )}
+              </div>
+            </div>
+
+            {/* Product Status Section */}
+            <div className="bg-third rounded-xl p-6 border border-gray-200">
+              <h2 className="text-xl font-semibold text-primary mb-6 flex items-center">
+                <span className="w-8 h-8 bg-accent rounded-full flex items-center justify-center text-white font-bold mr-3">4</span>
+                Product Status
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="flex items-center">
+                  <input
+                    className="w-4 h-4 text-accent bg-primary border-gray-300 rounded focus:ring-accent focus:ring-2"
+                    type="checkbox"
+                    {...register("sale")}
+                  />
+                  <label className="ml-3 text-sm font-medium text-primary">On Sale</label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    className="w-4 h-4 text-accent bg-primary border-gray-300 rounded focus:ring-accent focus:ring-2"
+                    type="checkbox"
+                    {...register("newArival")}
+                  />
+                  <label className="ml-3 text-sm font-medium text-primary">New Arrival</label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    className="w-4 h-4 text-accent bg-primary border-gray-300 rounded focus:ring-accent focus:ring-2"
+                    type="checkbox"
+                    {...register("available")}
+                    defaultChecked
+                  />
+                  <label className="ml-3 text-sm font-medium text-primary">Available</label>
+                </div>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center pt-6">
               <button
-                className="w-1/2 ml-1 mt-10 bg-danger rounded-full text-white px-auto py-0.5 hover:bg-transparent hover:border-[1px] hover:border-red-600 hover:text-danger"
+                type="button"
+                className="px-8 py-4 bg-accent hover:bg-green-600 text-white rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg font-semibold text-lg"
                 onClick={() => {
-                  let tempObj = storeSt;
-                  tempObj.pop();
-                  setStoreSt(tempObj);
+                  setShowModal(true);
                 }}
               >
-                delete last color
+                Create Product
               </button>
-            )}
-          </div>
+            </div>
+          </form>
         </div>
-        <label className="mt-5  ml-2">description</label>
-        <textarea
-          className="w-full h-56 bg-hover  mt-2 rounded-md text-secondary pl-3 py-0.5"
-          type="text"
-          placeholder="product description..."
-          {...register("description", { required: true })}
-        />
-        {errors.description && (
-          <p className="text-red-700 ml-10">enter the product description</p>
-        )}
-
-        <div className="mt-6">
-          <input className="mt-3 mr-2" type="checkbox" {...register("sale")} />
-          <label>on sale</label>
-        </div>
-        <div className="mt-6">
-          <input
-            className="mt-3 mr-2"
-            type="checkbox"
-            {...register("newArival")}
-          />
-          <label>new arival</label>
-        </div>
-        <div>
-          <input
-            className="mt-3 mr-2"
-            type="checkbox"
-            {...register("available")}
-            defaultChecked
-          />
-          <label>is available</label>
-        </div>
-
-        <button
-          className="w-3/4 mx-auto mt-10 bg-hover rounded-full text-secondary px-auto py-1.5 hover:bg-transparent hover:border-solid hover:border-[1px] hover:border-primarycont hover:text-primary"
-          onClick={() => {
-            setShowModal(true);
-          }}
-        >
-          submit
-        </button>
-      </form>
+      </div>
     </div>
   );
 }

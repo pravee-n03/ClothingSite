@@ -38,7 +38,7 @@ export default function ImageSelectore({ name, price, images }) {
             {name.replace(/_/g, " ")}
           </p>
           <p className="absolute sm:block bg-secondary pb-2 px-5 text-xl font-thin w-min capitalize">
-            {price}$
+            {price}₹
           </p>
         </div>
         {/*  big image */}

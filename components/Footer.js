@@ -22,6 +22,18 @@ function footer() {
           </li>
         ))}
       </ul>
+      <div className="flex justify-center space-x-6 py-3 text-sm">
+        <Link href="/privacy-policy">
+          <a className="text-secondary hover:text-accent transition-colors">
+            Privacy Policy
+          </a>
+        </Link>
+        <Link href="/contact">
+          <a className="text-secondary hover:text-accent transition-colors">
+            Contact
+          </a>
+        </Link>
+      </div>
         <div className="container mx-auto pt-3 px-5 flex justify-center">
           <p className="text-secondary text-sm text-center sm:text-left">
             © {new Date().getFullYear()} Nextommerce —

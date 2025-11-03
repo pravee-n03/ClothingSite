@@ -33,7 +33,16 @@ const orderSchema = new mongoose.Schema(
     sent:{
       type: Boolean,
       default: false,
-    }
+    },
+    payment_id: {
+      type: String,
+      required: true,
+    },
+    payment_status: {
+      type: String,
+      enum: ['pending', 'paid', 'failed'],
+      default: 'pending',
+    },
   },
   {
     timestamps: true,

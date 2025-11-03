@@ -102,57 +102,113 @@ export default function index({ orders }) {
     router.push(server + "/admin/order?key=" + keys + "&value=" + values);
   };
   return (
-    <div className="bg-secondary text-secondary py-12 px-5 relative w-full">
-      {/* query inputs */}
-      <div className="flex flex-col gap-y-6  justify-center lg:flex-row lg:justify-between">
-        <div className="flex flex-col gap-x-4 gap-y-6 md:flex-row align-middle w-3/4 mx-auto sm:w-full justify-start flex-wrap">
-          <input
-            placeholder="name"
-            className="bg-third rounded-full py-2 px-3  "
-            id="name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            placeholder="lastname"
-            className="bg-third rounded-full py-2 px-3  "
-            id="lastname"
-            type="text"
-            value={lastname}
-            onChange={(e) => setLastname(e.target.value)}
-          />
-          <select
-            className="rounded-full py-1 bg-third px-3 "
-            value={sent}
-            onChange={(e) => setSent(e.target.value)}
-          >
-            <option value="undefined">all</option>
-            <option value="true">sent orders</option>
-            <option value="false">in process orders</option>
-          </select>
-          <button
-            className="flex py-1 bg-third text-secondary rounded-full  px-4"
-            onClick={() => setShowCalender(true)}
-          >
-            <span className="mr-1 my-auto">calender</span>
-            <CalendarIcon className="my-auto" width={20} />
-          </button>
-          <button
-            className="flex px-4 py-2 bg-red-500 mx-auto sm:mx-0  text-white rounded-full"
-            onClick={() => setDateQuery()}
-          >
-            reset calender
-          </button>
-        </div>
-        <button
-          className="rounded-full bg-success text-white py-2 px-6 max-h-12 min-w-[200px] lg:min-w-[150px] mx-auto"
-          onClick={fetchOrders}
-        >
-          <div className="flex justify-center">
-            <span>search</span> <SearchIcon width={20} />
+    <div className="bg-secondary text-secondary min-h-screen py-8 px-4 relative w-full">
+      {/* Header */}
+      <div className="max-w-7xl mx-auto mb-8">
+        <div className="bg-third rounded-2xl shadow-xl p-6 border border-gray-200">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-primary mb-2">Order Management</h1>
+              <p className="text-secondary">Manage and track customer orders</p>
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-accent">{ordSt.length}</div>
+                <div className="text-sm text-secondary">Total Orders</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-success">
+                  {ordSt.filter(order => order.sent).length}
+                </div>
+                <div className="text-sm text-secondary">Delivered</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-alert">
+                  {ordSt.filter(order => !order.sent).length}
+                </div>
+                <div className="text-sm text-secondary">In Process</div>
+              </div>
+            </div>
           </div>
-        </button>
+
+          {/* Search and Filter Section */}
+          <div className="bg-secondary rounded-xl p-6 border border-gray-200">
+            <h2 className="text-xl font-semibold text-primary mb-4 flex items-center">
+              <SearchIcon className="w-5 h-5 mr-2" />
+              Search & Filter Orders
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Customer First Name
+                </label>
+                <input
+                  placeholder="Search by first name"
+                  className="w-full bg-third border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                  id="name"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Customer Last Name
+                </label>
+                <input
+                  placeholder="Search by last name"
+                  className="w-full bg-third border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                  id="lastname"
+                  type="text"
+                  value={lastname}
+                  onChange={(e) => setLastname(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Order Status
+                </label>
+                <select
+                  className="w-full bg-third border border-gray-300 rounded-xl py-3 px-4 focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                  value={sent}
+                  onChange={(e) => setSent(e.target.value)}
+                >
+                  <option value="undefined">All Orders</option>
+                  <option value="true">Delivered Orders</option>
+                  <option value="false">In Process Orders</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Date Range
+                </label>
+                <button
+                  className="w-full flex items-center justify-center py-3 px-4 bg-third border border-gray-300 rounded-xl hover:bg-gray-50 transition-all duration-200 focus:ring-2 focus:ring-accent focus:border-transparent outline-none"
+                  onClick={() => setShowCalender(true)}
+                >
+                  <CalendarIcon className="w-5 h-5 mr-2" />
+                  <span>Select Date Range</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                className="flex items-center justify-center px-6 py-3 bg-red-500 hover:bg-red-600 text-white rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                onClick={() => setDateQuery()}
+              >
+                <span>Reset Filters</span>
+              </button>
+              <button
+                className="flex items-center justify-center px-6 py-3 bg-accent hover:bg-green-600 text-white rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg"
+                onClick={fetchOrders}
+              >
+                <SearchIcon className="w-5 h-5 mr-2" />
+                <span>Search Orders</span>
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* orders */}

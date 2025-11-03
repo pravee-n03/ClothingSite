@@ -8,7 +8,7 @@ export default function Check({ total: subtotal, cartToggler }) {
       <div className="min-w-full min-h-[1px] bg-primarycont my-2 -mx-10"></div>
       <div className="flex flex-row justify-between">
         <div>{t('subtotal')}</div>
-        <div>$ {subtotal}</div>
+        <div>₹ {subtotal}</div>
       </div>
       <div className="my-1 flex flex-row justify-between">
         <div>{t('Tax')}</div>
@@ -21,7 +21,7 @@ export default function Check({ total: subtotal, cartToggler }) {
       <div className="min-w-full min-h-[1px] bg-hover my-2"></div>
       <div className="flex flex-row justify-between text-base">
         <div>{t("Total")}</div>
-        <div>${subtotal}</div>
+        <div>₹{subtotal}</div>
       </div>
       <div className="w-full mt-4 py-5 text-lg bg-primarycont text-primarycont text-center">
         <button onClick={cartToggler}>

@@ -1,9 +1,15 @@
 import { useForm } from "react-hook-form";
 import { useGlobalContext } from "../../Contexts/globalContext/context";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import { ShieldCheckIcon, EyeIcon, EyeOffIcon, UserGroupIcon } from "@heroicons/react/outline";
+
 export default function signup() {
-  const  router  = useRouter();
+  const router = useRouter();
   const { updateAccount } = useGlobalContext();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -11,198 +17,320 @@ export default function signup() {
   } = useForm();
 
   const submitHandler = async (form) => {
-    const res = await fetch("/api/auth/admin", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(form),
-    });
-    const data = await res.json();
-    if (data.account) {
-      const { name, lastname } = data.account;
-      updateAccount({ name, lastname, isAdmin:true });
-      router.push("/admin/order");
-    } else {
-      alert(data.message);
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/admin", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.account) {
+        const { name, lastname } = data.account;
+        updateAccount({ name, lastname, isAdmin: true });
+        router.push("/admin/order");
+      } else {
+        alert(data.message);
+      }
+    } catch (error) {
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-secondary text-secondary py-10">
-      <form
-        className="w-4/5 max-w-[500px] border-2 bg-third border-third p-6 sm:px-10 mx-auto rounded-xl flex flex-col"
-        onSubmit={handleSubmit(submitHandler)}
-      >
-        <label className="mb-1 text-primary text-lg" htmlFor="name">
-          First Name:
-        </label>
-        <input
-          className="rounded-full px-2 mb-6 bg-secondary"
-          placeholder="enter your First Name"
-          id="name"
-          type="text"
-          {...register("name", { required: true, maxLength: 20 })}
-        />
-        {errors.name && (
-          <p className="text-red-700 -mt-4 mb-4">
-            {errors.name.type == "required"
-              ? "* please enter your firstname"
-              : "* maximum lenght for first name is 20 character"}
-          </p>
-        )}
-        <label className="mb-1 text-primary text-lg" htmlFor="lastname">
-          Last Name:
-        </label>
-        <input
-          id="lastname"
-          className="rounded-full px-2 mb-6 bg-secondary"
-          placeholder="enter your Last Name"
-          type="text"
-          {...register("lastname", { required: true, maxLength: 20 })}
-        />
-        {errors.lastname && (
-          <p className="text-red-700 -mt-4 mb-4">
-            {errors.lastname.type == "required"
-              ? "* please enter your last name"
-              : "* maximum lenght for last name is 20 character"}
-          </p>
-        )}
-        <label className="mb-1 text-primary text-lg" htmlFor="email">
-          Email:
-        </label>
-        <input
-          id="email"
-          className="rounded-full px-2 mb-6 bg-secondary"
-          placeholder="enter your Email"
-          type="email"
-          {...register("email", {
-            required: true,
-            pattern:
-              /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-          })}
-        />
-        {errors.email && (
-          <p className="text-red-700 -mt-4 mb-4">
-            {errors.email.type == "required"
-              ? "* please enter your email"
-              : "* invalid Email"}
-          </p>
-        )}
-        <label className="mb-1 text-primary text-lg" htmlFor="password">
-          Password:
-        </label>
-        <input
-          id="password"
-          className="rounded-full px-2 mb-6 bg-secondary"
-          placeholder="enter a Password"
-          type="password"
-          {...register("password", {
-            required: true,
-            pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,40}$/,
-          })}
-        />
-        {errors.password && (
-          <p className="text-red-700 -mt-4 mb-4">
-            {errors.password.type == "required"
-              ? "* please enter a password"
-              : "* password must be between 6 and 40 characters included capital letters and numbers"}
-          </p>
-        )}
-
-        <p className="text-primary text-lg">choose a role:</p>
-        <div className="flex">
-          <input
-            id="admin"
-            name="role"
-            value="admin"
-            type="radio"
-            {...register("role", {
-              required: true,
-            })}
-          />
-          <label className="ml-1 pb-2" htmlFor="admin">
-            admin
-          </label>
-        </div>
-        <div className="flex mb-7">
-          <input
-            id="master"
-            name="role"
-            value="master"
-            type="radio"
-            {...register("role", {
-              required: true,
-            })}
-          />
-          <label className="ml-1 pb-2" htmlFor="master">
-            master
-          </label>
-        </div>
-        <br />
-        <div className="flex">
-          <input
-            id="root"
-            name="root"
-            value={() => EventTarget.value}
-            type="checkbox"
-            {...register("root")}
-          />
-          <label className="text-primary text-lg ml-1 pb-2" htmlFor="master">
-            root access
-          </label>
-          <br />
+    <div className="min-h-screen bg-gradient-to-br from-secondary via-third to-secondary flex items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-accent rounded-full mb-4 shadow-lg">
+            <UserGroupIcon className="w-8 h-8 text-white" />
+          </div>
+          <h1 className="text-3xl font-bold text-primary mb-2">Create Admin Account</h1>
+          <p className="text-secondary">Register a new administrator</p>
         </div>
 
-        <label className="mb-1 text-primary text-lg" htmlFor="adminEmail">
-          adminEmail:
-        </label>
-        <input
-          id="adminEmail"
-          className="rounded-full px-2 mb-6 bg-secondary"
-          placeholder="enter the Email of an already signed admin"
-          type="email"
-          {...register("adminEmail", {
-            required: true,
-            pattern:
-              /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-          })}
-        />
-        {errors.adminEmail && (
-          <p className="text-red-700 -mt-4 mb-4">
-            {errors.adminEmail.type == "required"
-              ? "* please enter admin Email"
-              : "* invalid Email"}
-          </p>
-        )}
-        <label className="mb-1 text-primary text-lg" htmlFor="adminPassword">
-          admin Password:
-        </label>
-        <input
-          id="enter the password of an already signed admin"
-          className="rounded-full px-2 mb-6 bg-secondary"
-          placeholder="enter admin Password"
-          type="password"
-          {...register("adminPassword", {
-            required: true,
-            pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,40}$/,
-          })}
-        />
-        {errors.adminPassword && (
-          <p className="text-red-700 -mt-4 mb-4">
-            {errors.adminPassword.type == "required"
-              ? "* please enter admin Password"
-              : "* password must be between 6 and 40 characters included capital letters and numbers"}
-          </p>
-        )}
+        {/* Form Card */}
+        <div className="bg-third rounded-2xl shadow-2xl border border-gray-200 p-8">
+          {/* Security Notice */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <ShieldCheckIcon className="w-5 h-5 text-blue-600 mr-2" />
+              <p className="text-sm text-blue-800 font-medium">
+                Administrator Registration
+              </p>
+            </div>
+            <p className="text-xs text-blue-700 mt-1">
+              This form requires verification from an existing administrator.
+            </p>
+          </div>
 
-        <button
-          type="submit"
-          className="bg-accent text-gray-200 my-5 text-lg rounded-full py-3 px-5"
-        >
-          Create account
-        </button>
-      </form>
+          <form className="space-y-6" onSubmit={handleSubmit(submitHandler)}>
+            {/* Personal Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-primary border-b border-gray-200 pb-2">
+                Personal Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    First Name
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                    placeholder="Enter first name"
+                    type="text"
+                    {...register("name", { required: true, maxLength: 20 })}
+                  />
+                  {errors.name && (
+                    <p className="text-danger text-sm mt-1">
+                      {errors.name.type == "required"
+                        ? "Please enter your first name"
+                        : "Maximum length is 20 characters"}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    Last Name
+                  </label>
+                  <input
+                    className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                    placeholder="Enter last name"
+                    type="text"
+                    {...register("lastname", { required: true, maxLength: 20 })}
+                  />
+                  {errors.lastname && (
+                    <p className="text-danger text-sm mt-1">
+                      {errors.lastname.type == "required"
+                        ? "Please enter your last name"
+                        : "Maximum length is 20 characters"}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Account Information Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-primary border-b border-gray-200 pb-2">
+                Account Information
+              </h3>
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Email Address
+                </label>
+                <input
+                  className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                  placeholder="Enter admin email"
+                  type="email"
+                  {...register("email", {
+                    required: true,
+                    pattern:
+                      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                  })}
+                />
+                {errors.email && (
+                  <p className="text-danger text-sm mt-1">
+                    {errors.email.type == "required"
+                      ? "Please enter your email"
+                      : "Invalid email address"}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Password
+                </label>
+                <div className="relative">
+                  <input
+                    className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none pr-12"
+                    placeholder="Create admin password"
+                    type={showPassword ? "text" : "password"}
+                    {...register("password", {
+                      required: true,
+                      pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,40}$/,
+                    })}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-primary transition-colors"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.password && (
+                  <p className="text-danger text-sm mt-1">
+                    {errors.password.type == "required"
+                      ? "Please enter a password"
+                      : "Password must be 6-40 characters with uppercase, lowercase, and numbers"}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Role Selection Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-primary border-b border-gray-200 pb-2">
+                Administrator Role
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center">
+                  <input
+                    id="admin"
+                    name="role"
+                    value="admin"
+                    type="radio"
+                    className="w-4 h-4 text-accent bg-secondary border-gray-300 focus:ring-accent focus:ring-2"
+                    {...register("role", {
+                      required: true,
+                    })}
+                  />
+                  <label className="ml-3 text-sm font-medium text-primary" htmlFor="admin">
+                    Admin - Standard administrator privileges
+                  </label>
+                </div>
+                <div className="flex items-center">
+                  <input
+                    id="master"
+                    name="role"
+                    value="master"
+                    type="radio"
+                    className="w-4 h-4 text-accent bg-secondary border-gray-300 focus:ring-accent focus:ring-2"
+                    {...register("role", {
+                      required: true,
+                    })}
+                  />
+                  <label className="ml-3 text-sm font-medium text-primary" htmlFor="master">
+                    Master - Advanced administrator privileges
+                  </label>
+                </div>
+                {errors.role && (
+                  <p className="text-danger text-sm mt-1">Please select a role</p>
+                )}
+              </div>
+
+              <div className="flex items-center">
+                <input
+                  id="root"
+                  name="root"
+                  type="checkbox"
+                  className="w-4 h-4 text-accent bg-secondary border-gray-300 rounded focus:ring-accent focus:ring-2"
+                  {...register("root")}
+                />
+                <label className="ml-3 text-sm font-medium text-primary" htmlFor="root">
+                  Root Access - Full system access (use with caution)
+                </label>
+              </div>
+            </div>
+
+            {/* Verification Section */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-primary border-b border-gray-200 pb-2">
+                Administrator Verification
+              </h3>
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-800">
+                  To create a new admin account, an existing administrator must verify this registration.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Existing Admin Email
+                </label>
+                <input
+                  className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                  placeholder="Enter existing admin email"
+                  type="email"
+                  {...register("adminEmail", {
+                    required: true,
+                    pattern:
+                      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+                  })}
+                />
+                {errors.adminEmail && (
+                  <p className="text-danger text-sm mt-1">
+                    {errors.adminEmail.type == "required"
+                      ? "Please enter existing admin email"
+                      : "Invalid email address"}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-primary mb-2">
+                  Existing Admin Password
+                </label>
+                <div className="relative">
+                  <input
+                    className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none pr-12"
+                    placeholder="Enter existing admin password"
+                    type={showAdminPassword ? "text" : "password"}
+                    {...register("adminPassword", {
+                      required: true,
+                      pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,40}$/,
+                    })}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-primary transition-colors"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                  >
+                    {showAdminPassword ? (
+                      <EyeOffIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+                {errors.adminPassword && (
+                  <p className="text-danger text-sm mt-1">
+                    {errors.adminPassword.type == "required"
+                      ? "Please enter existing admin password"
+                      : "Password must be 6-40 characters with uppercase, lowercase, and numbers"}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              className="w-full bg-accent hover:bg-green-600 text-white font-semibold py-3 px-4 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              type="submit"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                  Creating Admin Account...
+                </div>
+              ) : (
+                "Create Admin Account"
+              )}
+            </button>
+          </form>
+
+          {/* Footer Links */}
+          <div className="mt-6 text-center">
+            <a
+              href="/admin/login"
+              className="text-accent hover:text-green-600 font-medium transition-colors"
+            >
+              Already have an admin account? Sign in
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
