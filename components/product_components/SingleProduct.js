@@ -2,7 +2,7 @@ import React from "react";
 // product images component
 import ImageSelectore from "./ImagesSecelctor";
 // selece color size and add to cart component
-import ColorSizeSelector from "./ColorSizeSolector";
+import ColorSizeSelector from "./ColorSizeSelector";
 
 function SingleProduct({ product }) {
   const { name, price, store, description } = product;
@@ -14,24 +14,26 @@ function SingleProduct({ product }) {
   });
 
   return (
-    <div className="grid gridy">
-      {/* column 1 */}
-      <ImageSelectore name={name} price={price} images={images} />
-      {/* column 2 */}
-      <ColorSizeSelector
-        store={store}
-        description={description}
-        name={name}
-        price={price}
-        img={images[0]}
-      />
-      <style jsx>{`
-        @media screen and (min-width: 1024px) {
-          .gridy {
-            grid-template-columns: 65vw 35vw;
-          }
-        }
-      `}</style>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Image Section */}
+          <div className="lg:sticky lg:top-8 lg:self-start">
+            <ImageSelectore name={name} price={price} images={images} />
+          </div>
+
+          {/* Product Details Section */}
+          <div className="lg:pt-8">
+            <ColorSizeSelector
+              store={store}
+              description={description}
+              name={name}
+              price={price}
+              img={images[0]}
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

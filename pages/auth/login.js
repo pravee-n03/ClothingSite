@@ -26,16 +26,27 @@ export default function login() {
         },
         body: JSON.stringify(form),
       });
-      const data = await res.json();
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        console.error("Failed to parse response as JSON:", jsonError);
+        alert("Server error: Invalid response. Please check your connection and try again.");
+        return;
+      }
+      
       if (data.message == "login successfuly") {
         const { name, lastname, phone, address } = data.account;
         updateAccount({ name, lastname, phone, address, isAdmin: false });
         router.push("/");
       } else {
-        alert(data.message);
+        const errorMessage = data.message || data.error || "An error occurred. Please try again.";
+        alert(errorMessage);
       }
     } catch (error) {
-      alert("An error occurred. Please try again.");
+      console.error("Login error:", error);
+      alert("Network error: Could not connect to the server. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }

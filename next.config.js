@@ -8,7 +8,7 @@ module.exports = withPWA({
     disable: process.env.NODE_ENV === "development",
   },
   images: {
-    domains: ["demo.vercel.store", "cdn11.bigcommerce.com", "toodies.co"], // use the exact domains from your images
+    domains: ["demo.vercel.store", "cdn11.bigcommerce.com", "toodies.co", "res.cloudinary.com"], // use the exact domains from your images
   },
   env: {
     NEXT_PUBLIC_RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,

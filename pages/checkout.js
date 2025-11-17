@@ -6,6 +6,15 @@ import TableOrder from "../components/product_components/TableOrder";
 import { langs } from "../Contexts/values/LangValues";
 import { useEffect } from "react";
 import Script from "next/script";
+import {
+  LocationMarkerIcon,
+  TruckIcon,
+  CreditCardIcon,
+  ShieldCheckIcon,
+  UserIcon,
+  PhoneIcon,
+  HomeIcon
+} from "@heroicons/react/outline";
 
 export default function checkout() {
   const router = useRouter();
@@ -159,137 +168,254 @@ export default function checkout() {
         strategy="beforeInteractive"
       />
       <div
-      style={{ direction: `${lang === langs["fa"] ? "rtl" : "ltr"}` }}
-        className={`relative bg-secondary text-secondary py-10`}
+        style={{ direction: `${lang === langs["fa"] ? "rtl" : "ltr"}` }}
+        className="min-h-screen bg-gray-50 py-8"
       >
-        <div className="w-4/5 max-w-[500px] border-2 bg-third border-third p-6 sm:px-10 mx-auto rounded-xl flex flex-col">
-        <form
-        
-          onSubmit={handleSubmit(submitHandler)}
-          className="flex flex-col capitalize"
-        >
-          <label className="mb-1 text-primary text-lg" htmlFor="name">
-            {t("name")}:
-          </label>
-          <input
-            className="rounded-full px-2 mb-6 bg-secondary"
-            id="name"
-            type="text"
-            placeholder="enter your name"
-            {...register("name", {
-              required: true,
-              pattern:
-                /^[^+={}()<>!@#$%^&*?;:,|\\/_.\d]*[^\s+={}()<>!@#$%^&*?;:,|\\/_.\d]$/,
-            })}
-          />
-          {errors.name && (
-            <p className="text-red-700 -mt-4 mb-4">
-              {errors.name.type === "required"
-                ? "* enter your name"
-                : "* name should not end with white-space or contained any non-letter charachter"}
-            </p>
-          )}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-          <label className="mb-1 text-primary text-lg" htmlFor="lastname">
-            {t("lastname")}:
-          </label>
-          <input
-            className="rounded-full px-2 mb-6 bg-secondary"
-            type="text"
-            id="lastname"
-            placeholder="enter your lastname"
-            {...register("lastname", {
-              required: true,
-              pattern:
-                /^[^+={}()<>!@#$%^&*?;:,|\\/_.\d]*[^\s+={}()<>!@#$%^&*?;:,|\\/_.\d]$/,
-            })}
-          />
-          {errors.lastname && (
-            <p className="text-red-700 -mt-4 mb-4">
-              {errors.lastname.type === "required"
-                ? "* enter the your lastname"
-                : "* name should not end with white-space or contained any non-letter charachter"}
-            </p>
-          )}
+            {/* Left Column - Delivery Information */}
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Checkout</h1>
+                <p className="text-gray-600">Complete your order by providing delivery details</p>
+              </div>
 
-          <label className="mb-1 text-primary text-lg" htmlFor="phone">
-            {t("phone")}:
-          </label>
-          <input
-            className="rounded-full px-2 mb-6 bg-secondary"
-            id="phone"
-            type="text"
-            placeholder="enter your phone number"
-            {...register("phone", {
-              required: true,
-              pattern: /^\d+$/,
-            })}
-          />
-          {errors.phone && (
-            <p className="text-red-700 -mt-4 mb-4">
-              {errors.phone.type === "required"
-                ? "* enter your phone number"
-                : "* phone number not valid"}
-            </p>
-          )}
+              {/* Delivery Information Form */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center mb-6">
+                  <LocationMarkerIcon className="w-6 h-6 text-accent mr-3" />
+                  <h2 className="text-xl font-semibold text-gray-900">Delivery Information</h2>
+                </div>
 
-          <label className="mb-1 text-primary text-lg" htmlFor="address">
-            {t("address")}:
-          </label>
-          <input
-            className="rounded-full px-2 mb-6 bg-secondary"
-            id="address"
-            type="text"
-            placeholder="enter your address"
-            {...register("address", {
-              required: true,
-            })}
-          />
-          {errors.address && (
-            <p className="text-red-700 -mt-4 mb-4">* enter your address</p>
-          )}
+                <form onSubmit={handleSubmit(submitHandler)} className="space-y-6">
 
-          <h3 className="text-lg mt-5 text-primary">{t("cart_table")}</h3>
-          <TableOrder cart={cart} />
-          <div className="w-1/2 flex flex-col items-center mx-auto mt-7">
-            <button
-              type="submit"
-              disabled={paymentLoading}
-              className="rounded-full w-full mx-auto text-xl py-3 bg-accent text-white shadow-md my-8 disabled:opacity-50"
-            >
-              {paymentLoading ? t("Processing Payment...") : t("SUBMIT")}
-            </button>
-          </div>
-        </form>
-        <button
-          onClick={() => router.back()}
-          className="text-center rounded-full w-1/3 mx-auto text-sm py-1 bg-danger text-white"
-        >
-          {t("cancel")}
-        </button>
-        </div>
-        {/* modal */}
-        {send === true ? (
-          <div className="absolute top-0 bottom-0 right-0 left-0 flex justify-center items-center bg-[#000000d3]">
-            <div className="rounded-2xl bg-white w-3/4 min-w-[200px] max-w-[350px] pt-12 pb-9 text-center">
-              <h5 className="text-xl text-gray-900 mb-14">{t("asure_q")}</h5>
-              <div className="flex flex-row justify-around text-white w-full">
+                  {/* Name Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="name">
+                        <UserIcon className="w-4 h-4 inline mr-1" />
+                        First Name
+                      </label>
+                      <input
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
+                        id="name"
+                        type="text"
+                        placeholder="Enter your first name"
+                        {...register("name", {
+                          required: true,
+                          pattern: /^[^+={}()<>!@#$%^&*?;:,|\\/_.\d]*[^\s+={}()<>!@#$%^&*?;:,|\\/_.\d]$/,
+                        })}
+                      />
+                      {errors.name && (
+                        <p className="text-red-600 text-sm mt-1">
+                          {errors.name.type === "required"
+                            ? "First name is required"
+                            : "Invalid name format"}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="lastname">
+                        Last Name
+                      </label>
+                      <input
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
+                        type="text"
+                        id="lastname"
+                        placeholder="Enter your last name"
+                        {...register("lastname", {
+                          required: true,
+                          pattern: /^[^+={}()<>!@#$%^&*?;:,|\\/_.\d]*[^\s+={}()<>!@#$%^&*?;:,|\\/_.\d]$/,
+                        })}
+                      />
+                      {errors.lastname && (
+                        <p className="text-red-600 text-sm mt-1">
+                          {errors.lastname.type === "required"
+                            ? "Last name is required"
+                            : "Invalid name format"}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Phone Number */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="phone">
+                      <PhoneIcon className="w-4 h-4 inline mr-1" />
+                      Phone Number
+                    </label>
+                    <input
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-colors"
+                      id="phone"
+                      type="tel"
+                      placeholder="Enter your phone number"
+                      {...register("phone", {
+                        required: true,
+                        pattern: /^\d+$/,
+                      })}
+                    />
+                    {errors.phone && (
+                      <p className="text-red-600 text-sm mt-1">
+                        {errors.phone.type === "required"
+                          ? "Phone number is required"
+                          : "Invalid phone number"}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="address">
+                      <HomeIcon className="w-4 h-4 inline mr-1" />
+                      Delivery Address
+                    </label>
+                    <textarea
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-accent focus:border-transparent transition-colors resize-none"
+                      id="address"
+                      rows="4"
+                      placeholder="Enter your complete delivery address"
+                      {...register("address", {
+                        required: true,
+                      })}
+                    />
+                    {errors.address && (
+                      <p className="text-red-600 text-sm mt-1">Delivery address is required</p>
+                    )}
+                  </div>
+
+                  {/* Delivery Features */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200">
+                    <div className="flex items-center space-x-3 p-3 bg-green-50 rounded-lg">
+                      <TruckIcon className="w-6 h-6 text-green-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Free Delivery</p>
+                        <p className="text-xs text-gray-600">3-5 days</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg">
+                      <ShieldCheckIcon className="w-6 h-6 text-blue-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Secure Payment</p>
+                        <p className="text-xs text-gray-600">100% protected</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3 p-3 bg-purple-50 rounded-lg">
+                      <CreditCardIcon className="w-6 h-6 text-purple-600" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">Easy Returns</p>
+                        <p className="text-xs text-gray-600">30 days policy</p>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            {/* Right Column - Order Summary */}
+            <div className="space-y-6">
+              {/* Order Summary */}
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-6">Order Summary</h2>
+
+                {/* Order Items */}
+                <div className="space-y-4 mb-6">
+                  {cart.map((item, index) => (
+                    <div key={index} className="flex items-center space-x-4 py-4 border-b border-gray-200 last:border-b-0">
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                        <span className="text-xs font-medium text-gray-600">IMG</span>
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-sm font-medium text-gray-900">{item.name.replace(/_/g, " ")}</h3>
+                        <p className="text-sm text-gray-600">Color: {item.color} | Size: {item.size}</p>
+                        <p className="text-sm text-gray-600">Qty: {item.amount}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-sm font-medium text-gray-900">₹{(item.price * item.amount).toLocaleString()}</p>
+                        <p className="text-xs text-gray-600">₹{item.price.toLocaleString()} each</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Order Totals */}
+                <div className="border-t border-gray-200 pt-4 space-y-3">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-medium">₹{total.toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">Tax (GST 18%)</span>
+                    <span className="font-medium">₹{Math.round(total * 0.18).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-green-600">Shipping</span>
+                    <span className="font-medium text-green-600">FREE</span>
+                  </div>
+                  <div className="flex justify-between text-lg font-bold pt-3 border-t border-gray-200">
+                    <span>Total</span>
+                    <span>₹{(total + Math.round(total * 0.18)).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {/* Payment Button */}
                 <button
-                  onClick={() => {
-                    setSend(false);
-                  }}
-                  className="bg-danger py-2 w-[40%] rounded-full"
+                  onClick={handleSubmit(submitHandler)}
+                  disabled={paymentLoading}
+                  className="w-full mt-6 bg-accent hover:bg-green-600 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {t("return")}
+                  {paymentLoading ? (
+                    <div className="flex items-center justify-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
+                      Processing Payment...
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <CreditCardIcon className="w-5 h-5 mr-2" />
+                      Pay Now - ₹{(total + Math.round(total * 0.18)).toLocaleString()}
+                    </div>
+                  )}
+                </button>
+
+                {/* Cancel Button */}
+                <button
+                  onClick={() => router.back()}
+                  className="w-full mt-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-6 rounded-lg transition-colors"
+                >
+                  Continue Shopping
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Payment Confirmation Modal */}
+        {send === true ? (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl max-w-md w-full p-6 text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ShieldCheckIcon className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Your Order</h3>
+              <p className="text-gray-600 mb-6">Please review your order details before confirming</p>
+
+              <div className="flex space-x-3">
+                <button
+                  onClick={() => setSend(false)}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition-colors"
+                >
+                  Review Order
                 </button>
                 <button
                   onClick={() => {
                     setSend(false);
                     sendOrder();
                   }}
-                  className="bg-accent py-2 w-[45%] rounded-full"
+                  className="flex-1 bg-accent hover:bg-green-600 text-white font-medium py-3 px-4 rounded-lg transition-colors"
                 >
-                  {t("continue")}
+                  Confirm Order
                 </button>
               </div>
             </div>

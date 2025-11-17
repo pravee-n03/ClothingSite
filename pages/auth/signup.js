@@ -32,16 +32,33 @@ export default function signup() {
         },
         body: JSON.stringify(form),
       });
-      const data = await res.json();
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        console.error("Failed to parse response as JSON:", jsonError);
+        alert("Server error: Invalid response. Please check your connection and try again.");
+        return;
+      }
+      
+      if (!res.ok && !data.user) {
+        const errorMessage = data.message || data.error || `Error: ${res.status} ${res.statusText}`;
+        alert(errorMessage);
+        return;
+      }
+      
       if (data.user) {
         const { name, lastname, phone, address } = data.user;
         updateAccount({ name, lastname, phone, address, isAdmin: false });
         router.push("/");
       } else {
-        alert(data.message);
+        const errorMessage = data.message || data.error || "An error occurred. Please try again.";
+        alert(errorMessage);
       }
     } catch (error) {
-      alert("An error occurred. Please try again.");
+      console.error("Signup error:", error);
+      alert("Network error: Could not connect to the server. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }

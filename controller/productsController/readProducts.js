@@ -6,8 +6,10 @@ export default async function readProduct(req, res) {
   // creats a propper condition object if quety had filter key format
   var conObj = new Object();
   if (filter !== undefined && value !== undefined && value!=="undefined") {
-    if (value === "true" || value === "false") {
-      conObj[filter] = value;
+    if (value === "true") {
+      conObj[filter] = true;
+    } else if (value === "false") {
+      conObj[filter] = false;
     } else {
       conObj[filter] = new RegExp(value, "i");
     }

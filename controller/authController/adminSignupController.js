@@ -22,6 +22,11 @@ export default async function signupController(req, res) {
   const adminCount = await Admin.countDocuments();
   const requiresVerification = adminCount > 0;
 
+  // If no admins exist, allow first admin creation without verification
+  if (!requiresVerification) {
+    // Skip verification for first admin
+  }
+
   if (
     name &&
     lastname &&
@@ -96,8 +101,9 @@ export default async function signupController(req, res) {
         throw Error("token did not saved successfuly");
       }
     } catch (error) {
+      console.error("Admin signup error:", error);
       if (error.code == 11000) {//duplication error for email
-        return res.status(500).send({ message: "This Email has been used before" });
+        return res.status(500).json({ message: "This Email has been used before" });
       }
       errorController(500, error, res);
     }

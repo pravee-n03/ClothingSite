@@ -25,22 +25,38 @@ export default function login() {
         },
         body: JSON.stringify(form)
       });
-      const data = await res.json();
-      console.log(res);
+      
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        console.error("Failed to parse response as JSON:", jsonError);
+        alert("Server error: Invalid response. Please check your connection and try again.");
+        return;
+      }
+      
+      console.log("Response status:", res.status, "Data:", data);
+      
       if (data.account) {
         const { name, lastname } = data.account;
         updateAccount({ name, lastname, isAdmin: true });
         router.push("/admin/order");
       } else {
-        console.log(data);
-        if (data.message.message) {
-          alert(data.message.message);
-        } else {
-          alert(data.message);
+        let errorMessage = "An error occurred. Please try again.";
+        if (data.message) {
+          if (typeof data.message === 'object' && data.message.message) {
+            errorMessage = data.message.message;
+          } else if (typeof data.message === 'string') {
+            errorMessage = data.message;
+          }
+        } else if (data.error) {
+          errorMessage = data.error;
         }
+        alert(errorMessage);
       }
     } catch (error) {
-      alert("An error occurred. Please try again.");
+      console.error("Admin login error:", error);
+      alert("Network error: Could not connect to the server. Please check your connection and try again.");
     } finally {
       setIsLoading(false);
     }

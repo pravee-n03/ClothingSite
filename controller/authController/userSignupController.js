@@ -58,12 +58,13 @@ export default async function signupController(req, res) {
         }
       }
     } catch (error) {
+      console.error("Signup error:", error);
       if (error.code == 11000) {
-        return res.status(500).send({ message: "Email has been used before" });
+        return res.status(500).json({ message: "Email has been used before" });
       }
       errorController(500, error, res);
     }
   } else {
-    res.status(422).send({ message: "data_incomplete" });
+    res.status(422).json({ message: "data_incomplete" });
   }
 }

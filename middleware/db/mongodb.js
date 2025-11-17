@@ -3,21 +3,31 @@ import mongoose from "mongoose";
 
 const connectDB = (handler) => async (req, res) => {
   try {
-    if (mongoose.connections[0].readyState) {
-      // Use current db connection
-      return handler(req, res);
+    // Check if MONGODB_URI is set
+    if (!process.env.MONGODB_URI) {
+      console.error("MONGODB_URI environment variable is not set");
+      return res.status(500).json({ message: 'Database configuration error: MONGODB_URI is not set' });
     }
-    // Use new db connection
+
+    // Check if mongoose is already connected
+    if (mongoose.connections[0].readyState === 1) {
+      // Use existing connection
+      return await handler(req, res);
+    }
+
+    // Create new connection
     await mongoose.connect(process.env.MONGODB_URI, {
       useUnifiedTopology: true,
       useNewUrlParser: true,
     });
-    return handler(req, res);
+    
+    return await handler(req, res);
   } catch (err) {
-    console.log("DATABASE CONNETCTION FAILED");
-    console.log(err.message);
-    res.status(500).json({ error: 'Database connection failed: ' + err.message });
-    return;
+    console.error("DATABASE CONNECTION FAILED:", err.message);
+    console.error("Full error:", err);
+    if (!res.headersSent) {
+      return res.status(500).json({ message: 'Database connection failed: ' + err.message });
+    }
   }
 };
 

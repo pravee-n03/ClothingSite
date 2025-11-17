@@ -27,11 +27,12 @@ export default connectDB(reqHandler);
 async function getCats(req, res) {
   try {
     const rawCats = await Category.find({});
+    console.log('Raw categories from DB:', rawCats); // Debug log
     const cats = rawCats.map((cat) => cat.name);
-    if (cats) return res.status(200).send(cats);
-    else
-      return res.status(200).json({ message: "categories are not available" });
+    console.log('Mapped categories:', cats); // Debug log
+    return res.status(200).json(cats);
   } catch (error) {
+    console.error('Error in getCats:', error); // Debug log
     errorHandler(error, res);
   }
 }

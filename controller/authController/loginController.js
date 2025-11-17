@@ -63,6 +63,7 @@ export default async function loginController(req, res,isAdmin) {
       return res.status(200).json({ message: "this email is not registerd" });
     }
   } catch (err) {
+    console.error("Login error:", err);
     errorController(500, err, res);
   }
 }

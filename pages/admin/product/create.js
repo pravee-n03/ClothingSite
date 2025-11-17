@@ -16,19 +16,26 @@ function create() {
 
   const [allCats, setCats] = useState([]);
   //categories that fetch from DB
-  useEffect(async () => {
-    if (allCats === undefined) return;
-    if (allCats.length === 0) {
-      const res = await fetch(`${server}/api/product/categories`, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      setCats(data);
-    }
-  }, [allCats]);
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (allCats.length === 0) {
+        try {
+          const res = await fetch(`${server}/api/product/categories`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          const data = await res.json();
+          console.log('Fetched categories:', data); // Debug log
+          setCats(data);
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+        }
+      }
+    };
+    fetchCategories();
+  }, []);
 
   //states for diffrent kinds of a product diffrent colors sizes and amounts
   const [storeSt, setStoreSt] = useState([
@@ -90,6 +97,7 @@ function create() {
       available,
     };
     setFinalPro(newProduct);
+    setShowModal(true); // Show modal after form validation
   };
 
   return (
@@ -296,11 +304,8 @@ function create() {
             {/* Submit Button */}
             <div className="flex justify-center pt-6">
               <button
-                type="button"
+                type="submit"
                 className="px-8 py-4 bg-accent hover:bg-green-600 text-white rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg font-semibold text-lg"
-                onClick={() => {
-                  setShowModal(true);
-                }}
               >
                 Create Product
               </button>

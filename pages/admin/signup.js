@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { useGlobalContext } from "../../Contexts/globalContext/context";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShieldCheckIcon, EyeIcon, EyeOffIcon, UserGroupIcon } from "@heroicons/react/outline";
 
 export default function signup() {
@@ -10,11 +10,25 @@ export default function signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [requiresVerification, setRequiresVerification] = useState(true);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    const checkAdminCount = async () => {
+      try {
+        const res = await fetch("/api/auth/admin-count");
+        const data = await res.json();
+        setRequiresVerification(data.count > 0);
+      } catch (error) {
+        console.error("Error checking admin count:", error);
+      }
+    };
+    checkAdminCount();
+  }, []);
 
   const submitHandler = async (form) => {
     setIsLoading(true);
@@ -234,74 +248,76 @@ export default function signup() {
             </div>
 
             {/* Verification Section */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-primary border-b border-gray-200 pb-2">
-                Administrator Verification
-              </h3>
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-800">
-                  To create a new admin account, an existing administrator must verify this registration.
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-primary mb-2">
-                  Existing Admin Email
-                </label>
-                <input
-                  className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
-                  placeholder="Enter existing admin email"
-                  type="email"
-                  {...register("adminEmail", {
-                    required: true,
-                    pattern:
-                      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-                  })}
-                />
-                {errors.adminEmail && (
-                  <p className="text-danger text-sm mt-1">
-                    {errors.adminEmail.type == "required"
-                      ? "Please enter existing admin email"
-                      : "Invalid email address"}
+            {requiresVerification && (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-primary border-b border-gray-200 pb-2">
+                  Administrator Verification
+                </h3>
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <p className="text-sm text-yellow-800">
+                    To create a new admin account, an existing administrator must verify this registration.
                   </p>
-                )}
-              </div>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium text-primary mb-2">
-                  Existing Admin Password
-                </label>
-                <div className="relative">
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    Existing Admin Email
+                  </label>
                   <input
-                    className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none pr-12"
-                    placeholder="Enter existing admin password"
-                    type={showAdminPassword ? "text" : "password"}
-                    {...register("adminPassword", {
-                      required: true,
-                      pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,40}$/,
+                    className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none"
+                    placeholder="Enter existing admin email"
+                    type="email"
+                    {...register("adminEmail", {
+                      required: requiresVerification,
+                      pattern:
+                        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
                     })}
                   />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-primary transition-colors"
-                    onClick={() => setShowAdminPassword(!showAdminPassword)}
-                  >
-                    {showAdminPassword ? (
-                      <EyeOffIcon className="w-5 h-5" />
-                    ) : (
-                      <EyeIcon className="w-5 h-5" />
-                    )}
-                  </button>
+                  {errors.adminEmail && (
+                    <p className="text-danger text-sm mt-1">
+                      {errors.adminEmail.type == "required"
+                        ? "Please enter existing admin email"
+                        : "Invalid email address"}
+                    </p>
+                  )}
                 </div>
-                {errors.adminPassword && (
-                  <p className="text-danger text-sm mt-1">
-                    {errors.adminPassword.type == "required"
-                      ? "Please enter existing admin password"
-                      : "Password must be 6-40 characters with uppercase, lowercase, and numbers"}
-                  </p>
-                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-primary mb-2">
+                    Existing Admin Password
+                  </label>
+                  <div className="relative">
+                    <input
+                      className="w-full px-4 py-3 bg-secondary border border-gray-300 rounded-xl focus:ring-2 focus:ring-accent focus:border-transparent transition-all duration-200 outline-none pr-12"
+                      placeholder="Enter existing admin password"
+                      type={showAdminPassword ? "text" : "password"}
+                      {...register("adminPassword", {
+                        required: requiresVerification,
+                        pattern: /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,40}$/,
+                      })}
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary hover:text-primary transition-colors"
+                      onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    >
+                      {showAdminPassword ? (
+                        <EyeOffIcon className="w-5 h-5" />
+                      ) : (
+                        <EyeIcon className="w-5 h-5" />
+                      )}
+                    </button>
+                  </div>
+                  {errors.adminPassword && (
+                    <p className="text-danger text-sm mt-1">
+                      {errors.adminPassword.type == "required"
+                        ? "Please enter existing admin password"
+                        : "Password must be 6-40 characters with uppercase, lowercase, and numbers"}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Submit Button */}
             <button

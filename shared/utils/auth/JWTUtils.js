@@ -32,6 +32,12 @@ const secreter = (type) => {
       : type === accessToken.type
       ? process.env.access
       : null;
-  if (secret === null) throw Error("Type of token rejected");
+  if (secret === null) {
+    throw Error("Type of token rejected");
+  }
+  if (!secret) {
+    const missingVar = type === refreshToken.type ? "refresh" : "access";
+    throw Error(`JWT secret (${missingVar}) is not set in environment variables`);
+  }
   return secret;
 };
