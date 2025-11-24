@@ -3,7 +3,7 @@ import Cookies from "cookies";
 // set access and refresh JWT tokens as httpOnly cookies
 export const cookieGenerator = (tknInf, token, req, res) => {
   const cookies = new Cookies(req, res);
-  const isSecure = req.connection.encrypted; // Only set secure if connection is HTTPS
+  const isSecure = process.env.NODE_ENV === 'production'; // Set secure for production (HTTPS)
 
   cookies.set(tknInf.type, token, {
     httpOnly: true,
@@ -15,7 +15,7 @@ export const cookieGenerator = (tknInf, token, req, res) => {
 
 export const deleteCookie = (type, req, res) => {
   const cookies = new Cookies(req, res);
-  const isSecure = req.connection.encrypted; // Only set secure if connection is HTTPS
+  const isSecure = process.env.NODE_ENV === 'production'; // Set secure for production (HTTPS)
   cookies.set(type, "", {
     httpOnly: true,
     secure: isSecure,
@@ -26,7 +26,7 @@ export const deleteCookie = (type, req, res) => {
 
 export const isAdminCookie = (req, res, isAdmin) => {
   const cookies = new Cookies(req, res);
-  const isSecure = req.connection.encrypted; // Only set secure if connection is HTTPS
+  const isSecure = process.env.NODE_ENV === 'production'; // Set secure for production (HTTPS)
   cookies.set("isAdmin", `${isAdmin}`, {
     httpOnly: true,
     secure: isSecure,
@@ -35,7 +35,7 @@ export const isAdminCookie = (req, res, isAdmin) => {
 };
 export const isAdminDelete = (req, res) => {
   const cookies = new Cookies(req, res);
-  const isSecure = req.connection.encrypted; // Only set secure if connection is HTTPS
+  const isSecure = process.env.NODE_ENV === 'production'; // Set secure for production (HTTPS)
   cookies.set("isAdmin", "", {
     httpOnly: true,
     secure: isSecure,
