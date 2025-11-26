@@ -241,7 +241,7 @@ export default function signup() {
                   </a>
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy">
+                <Link href="/privacy-policy">
                   <a className="text-accent hover:text-green-600 font-medium">
                     Privacy Policy
                   </a>
